@@ -45,13 +45,16 @@ func getNavItems(doc *goquery.Document) (navItems []NavItemGroup) {
 		if len(match) != 2 {
 			return
 		}
-		str := strings.Replace(match[1], `{\"hierarchy\":\"hk-navigation\"}`, "hk-navigation", 1)
+		str := strings.Replace(match[1], `{\"section\":\"/\"}`, "hk-navigation", 1)
 		json.Unmarshal([]byte(str), &nav)
 	})
 	for _, section := range nav.Service.Navigation.Data.Children {
 		items := []NavItem{}
 		for _, item := range section.Children {
 			if item.Url == "/daily/catalog" {
+				continue
+			}
+			if !regexp.MustCompile("^/(realtime|enews|video|daily|ETW)/?").MatchString(item.Url) {
 				continue
 			}
 			items = append(items, NavItem{
